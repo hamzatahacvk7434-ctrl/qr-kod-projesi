@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hızlı, güvenli ve modern QR kod oluşturucu ve tarayıcı uygulaması. Kamerayla tarama yapın veya kendi QR kodunuzu oluşturun.">
+    <title>QR Kod Oluşturucu ve Okuyucu</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- QR Code Generator Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <!-- QR Code Scanner Library -->
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/html5-qrcode.min.js"></script>
+</head>
+<body>
+    <div class="bg-blur bg-blur-1"></div>
+    <div class="bg-blur bg-blur-2"></div>
+
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="app-header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 3H9V9H3V3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M15 3H21V9H15V3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M3 15H9V21H3V15Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M15 15H18V18H15V15Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M18 18H21V21H18V18Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M15 18H18V21H15V18Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M18 15H21V18H18V15Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M6 6H6.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M18 6H18.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 18H6.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h1 id="main-title">QR Kod Pro</h1>
+            </div>
+            <p class="app-subtitle">Hızlıca QR kod oluşturun ve kameranız veya görselleriniz üzerinden anında okutun.</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tab-navigation">
+            <div class="tab-indicator-bg">
+                <div class="tab-slider"></div>
+            </div>
+            <button id="btn-tab-generate" class="tab-btn active" data-tab="generate">
+                <svg class="tab-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                QR Kod Oluştur
+            </button>
+            <button id="btn-tab-scan" class="tab-btn" data-tab="scan">
+                <svg class="tab-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                QR Kod Oku
+            </button>
+        </nav>
+
+        <!-- Main Workspace -->
+        <main class="workspace-container">
+            
+            <!-- Tab 1: QR Code Generator -->
+            <section id="panel-generate" class="tab-panel active">
+                <div class="panel-layout">
+                    <!-- Left: Control Panel -->
+                    <div class="glass-card control-card">
+                        <h2 class="section-title">QR Detayları</h2>
+                        
+                        <div class="form-group">
+                            <label for="text-input" class="form-label">Metin veya URL Girin</label>
+                            <div class="input-wrapper">
+                                <textarea id="text-input" class="form-textarea" placeholder="Buraya yazın..." maxlength="1000"></textarea>
+                                <span id="char-counter" class="char-counter">0 / 1000</span>
+                            </div>
+                        </div>
+
+                        <!-- Settings Accordion/List -->
+                        <div class="settings-grid">
+                            <div class="form-group">
+                                <label for="select-size" class="form-label">Boyut</label>
+                                <select id="select-size" class="form-select">
+                                    <option value="200">200 x 200 px</option>
+                                    <option value="300" selected>300 x 300 px</option>
+                                    <option value="400">400 x 400 px</option>
+                                    <option value="500">500 x 500 px</option>
+                                    <option value="600">600 x 600 px</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="select-ecc" class="form-label">Hata Düzeltme Seviyesi</label>
+                                <select id="select-ecc" class="form-select">
+                                    <option value="L">Düşük (L - %7)</option>
+                                    <option value="M" selected>Orta (M - %15)</option>
+                                    <option value="Q">Kalite (Q - %25)</option>
+                                    <option value="H">Yüksek (H - %30)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="color-dark" class="form-label">QR Kod Rengi</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="color-dark" class="form-color" value="#0f0c1b">
+                                    <span id="dark-color-hex" class="color-hex">#0F0C1B</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="color-light" class="form-label">Arka Plan Rengi</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="color-light" class="form-color" value="#ffffff">
+                                    <span id="light-color-hex" class="color-hex">#FFFFFF</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group margin-span">
+                                <label for="range-margin" class="form-label">Dış Boşluk (Margin): <span id="margin-value">4</span></label>
+                                <input type="range" id="range-margin" min="0" max="10" step="1" value="4" class="form-range">
+                            </div>
+                        </div>
+
+                        <button id="btn-generate" class="btn btn-primary btn-block">
+                            <span>QR Kod Oluştur</span>
+                            <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Right: Preview Card -->
+                    <div class="glass-card preview-card">
+                        <h2 class="section-title">Önizleme</h2>
+                        <div class="qr-mockup-container">
+                            <div id="qr-preview-wrapper" class="qr-preview-wrapper">
+                                <canvas id="qr-canvas"></canvas>
+                                <div id="qr-placeholder" class="qr-placeholder">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="placeholder-icon">
+                                        <path d="M4 4H10V10H4V4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                        <path d="M14 4H20V10H14V4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                        <path d="M4 14H10V20H4V14Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                        <path d="M14 14H17V17H14V14Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                        <path d="M17 17H20V20H17V17Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                        <path d="M14 17H17V20H14V17Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                        <path d="M17 14H20V17H17V14Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span>Metin girdikten sonra otomatik veya "QR Kod Oluştur" butonuna basarak QR kodunuzu oluşturabilirsiniz.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preview-actions">
+                            <button id="btn-download" class="btn btn-secondary" disabled>
+                                <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                PNG İndir
+                            </button>
+                            <button id="btn-copy" class="btn btn-secondary" disabled>
+                                <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                </svg>
+                                Panoya Kopyala
+                            </button>
+                            <button id="btn-clear-gen" class="btn btn-muted">Temizle</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 2: QR Code Reader -->
+            <section id="panel-scan" class="tab-panel">
+                <div class="panel-layout">
+                    <!-- Left: Scanner View / Camera / Dropzone -->
+                    <div class="glass-card scanner-card">
+                        <div class="scanner-header">
+                            <h2 class="section-title">Tarayıcı</h2>
+                            <div class="scan-mode-toggle">
+                                <button id="btn-mode-camera" class="mode-btn active">Kamera ile Oku</button>
+                                <button id="btn-mode-file" class="mode-btn">Görsel Yükle</button>
+                            </div>
+                        </div>
+
+                        <!-- Scan Mode: Camera -->
+                        <div id="scanner-camera-section" class="scan-section active">
+                            <div class="camera-controls">
+                                <div class="select-camera-wrapper">
+                                    <label for="camera-select" class="form-label sr-only">Kamera Seçin</label>
+                                    <select id="camera-select" class="form-select">
+                                        <option value="">Kamera algılanıyor...</option>
+                                    </select>
+                                </div>
+                                <div class="camera-buttons">
+                                    <button id="btn-start-camera" class="btn btn-primary">
+                                        <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                        Kamerayı Başlat
+                                    </button>
+                                    <button id="btn-stop-camera" class="btn btn-danger hidden">
+                                        <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                        </svg>
+                                        Kamerayı Durdur
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="scanner-viewport-wrapper">
+                                <div id="reader"></div>
+                                <div id="scanner-overlay" class="scanner-overlay hidden">
+                                    <div class="scanner-corners">
+                                        <span class="corner top-left"></span>
+                                        <span class="corner top-right"></span>
+                                        <span class="corner bottom-left"></span>
+                                        <span class="corner bottom-right"></span>
+                                    </div>
+                                    <div class="laser-line"></div>
+                                    <div class="pulse-ring"></div>
+                                </div>
+                                <div id="camera-fallback" class="camera-fallback">
+                                    <div class="fallback-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 18C15.3137 18 18 15.3137 18 12C18 8.68629 15.3137 6 12 6C8.68629 6 6 8.68629 6 12C6 15.3137 8.68629 18 12 18Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"/>
+                                            <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"/>
+                                            <path d="M3.25 10H5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M18.75 10H20.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M12 2V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M12 20V22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <p class="fallback-text">QR kodu kameraya doğrultup okutmak için "Kamerayı Başlat" butonuna basın.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scan Mode: File Upload -->
+                        <div id="scanner-file-section" class="scan-section">
+                            <div id="drop-zone" class="drop-zone">
+                                <input type="file" id="file-input" accept="image/*" class="file-input">
+                                <div class="drop-zone-content">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="upload-icon">
+                                        <path d="M12 16V8M12 8L9 11M12 8L15 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M3 15V16C3 18.2091 4.79086 20 7 20H17C19.2091 20 21 18.2091 21 16V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <p class="upload-text-main">QR kod görselini buraya sürükleyin</p>
+                                    <p class="upload-text-sub">veya bilgisayarınızdan seçmek için tıklayın</p>
+                                </div>
+                            </div>
+                            <div id="file-preview-card" class="file-preview-card hidden">
+                                <div class="preview-img-container">
+                                    <img id="scanned-file-preview" alt="Taranacak QR Kod Görseli">
+                                </div>
+                                <button id="btn-cancel-file" class="btn btn-muted btn-sm">Dosyayı Değiştir</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Results Card -->
+                    <div class="glass-card result-card">
+                        <h2 class="section-title">Tarama Sonucu</h2>
+                        
+                        <div class="result-display-wrapper">
+                            <!-- Inactive / Idle state -->
+                            <div id="result-state-idle" class="result-state active">
+                                <div class="state-icon info-icon">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <p>QR kod okunduğunda sonuç burada görüntülenecektir.</p>
+                            </div>
+
+                            <!-- Processing / Scanning state -->
+                            <div id="result-state-scanning" class="result-state">
+                                <div class="spinner"></div>
+                                <p>Görsel analiz ediliyor...</p>
+                            </div>
+
+                            <!-- Error State -->
+                            <div id="result-state-error" class="result-state">
+                                <div class="state-icon error-icon">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                </div>
+                                <p id="scan-error-msg">Görselde geçerli bir QR kod bulunamadı.</p>
+                            </div>
+
+                            <!-- Success / Resolved State -->
+                            <div id="result-state-success" class="result-state">
+                                <div class="state-icon success-icon">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div class="success-message">QR Kod Başarıyla Okundu!</div>
+                                
+                                <div class="result-textarea-wrapper">
+                                    <label for="scanned-result-text" class="sr-only">Okunan Sonuç</label>
+                                    <textarea id="scanned-result-text" class="result-textarea" readonly></textarea>
+                                </div>
+
+                                <div class="result-actions">
+                                    <button id="btn-result-copy" class="btn btn-secondary btn-block">
+                                        <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                        </svg>
+                                        Sonucu Kopyala
+                                    </button>
+                                    <a id="btn-result-visit" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block hidden">
+                                        <span>Bağlantıyı Aç</span>
+                                        <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                    </a>
+                                    <button id="btn-rescan" class="btn btn-muted btn-block">Yeni Tarama Başlat</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="app-footer">
+            <p>&copy; 2026 QR Kod Pro - Tüm hakları saklıdır.</p>
+        </footer>
+    </div>
+    
+    <!-- Script file -->
+    <script src="script.js"></script>
+</body>
+</html>
